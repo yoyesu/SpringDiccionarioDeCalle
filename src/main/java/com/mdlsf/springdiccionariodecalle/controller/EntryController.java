@@ -1,7 +1,6 @@
 package com.mdlsf.springdiccionariodecalle.controller;
 
 import com.mdlsf.springdiccionariodecalle.entities.Entry;
-import com.mdlsf.springdiccionariodecalle.entities.EntryDef;
 import com.mdlsf.springdiccionariodecalle.repos.EntryDefRepository;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @RestController
 public class EntryController {
@@ -34,19 +32,20 @@ public class EntryController {
     }
 
     @GetMapping("/")
-    public List<EntryDef> getTenFirstEntries(){
-        List<EntryDef> list = entryDefRepository.findAll();
-        List<EntryDef> smallerList = new ArrayList<>();
-        int count = 0;
-        for(int i = 0; i < list.size(); i++){
+    public List<Entry> getTenEntries(){
+        List<Entry> list = entryRepository.findAll();
+        List<Entry> smallerList = new ArrayList<>();
+
+        for(int i = 0; i < 3; i++){
 
             smallerList.add(list.get(i));
-            if(count == 1){
-                break;
-            }
-            count++;
+
         }
 
         return smallerList;
     }
+
+    //TODO post method to add new entry
+    //TODO delete method to delete entry
+    //TODO GET 10 latest added entries
 }
