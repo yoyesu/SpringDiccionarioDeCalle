@@ -4,9 +4,7 @@ import com.mdlsf.springdiccionariodecalle.entities.Entry;
 import com.mdlsf.springdiccionariodecalle.repos.EntryDefRepository;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +21,21 @@ public class EntryController {
         this.entryDefRepository = entryDefRepository;
     }
 
+    @GetMapping("/")
+    public List<Entry> getLastTenEntries(){
+        List<Entry> list = entryRepository.findAll();
+        List<Entry> smallerList = new ArrayList<>();
+
+        int listSize = list.size() -1;
+        for(int i = 0; i < 10; i++){
+
+            smallerList.add(list.get(listSize--));
+
+        }
+
+        return smallerList;
+    }
+
     @GetMapping("/search/{initial}")
     public List<Entry> getEntryByInitial(@PathVariable String initial){
         List<Entry> list = new ArrayList<>();
@@ -31,21 +44,14 @@ public class EntryController {
         return list;
     }
 
-    @GetMapping("/")
-    public List<Entry> getTenEntries(){
-        List<Entry> list = entryRepository.findAll();
-        List<Entry> smallerList = new ArrayList<>();
-
-        for(int i = 0; i < 3; i++){
-
-            smallerList.add(list.get(i));
-
-        }
-
-        return smallerList;
+    @DeleteMapping("/remove/{id}")
+    public void deleteEntryById(@PathVariable int id){
+        entryRepository.deleteById(id);
     }
-
     //TODO post method to add new entry
-    //TODO delete method to delete entry
-    //TODO GET 10 latest added entries
+
+    @PostMapping("/new")
+    public void addNewEntry(@RequestBody Entry entry){
+        entryRepository.save(entry);
+    }
 }

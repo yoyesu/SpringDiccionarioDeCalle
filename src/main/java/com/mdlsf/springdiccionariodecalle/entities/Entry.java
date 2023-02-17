@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -19,7 +20,7 @@ public class Entry {
 
     private String entryName;
 
-    private Instant lastUpdated;
+    private Instant lastUpdated = Instant.now();
 
 
     private Set<Definition> definitions = new LinkedHashSet<>();
