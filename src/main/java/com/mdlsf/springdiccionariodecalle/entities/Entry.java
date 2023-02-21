@@ -7,24 +7,17 @@ import java.time.Instant;
 @Entity
 @Table(name = "entries")
 public class Entry {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EmbeddedId
+
     private EntryId id;
 
-    @MapsId("entryId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "entry_id", nullable = false)
     private Term term;
 //TODO add last updated field (if any update is made to the entry or the definition, this date should be updated)
-    @MapsId("defId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "def_id", nullable = false)
     private Definition def;
 
-    @NotNull
-    @Column(name = "last_updated", nullable = false)
     private Instant lastUpdated = Instant.now();
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EmbeddedId
     public EntryId getId() {
         return id;
     }
@@ -33,14 +26,20 @@ public class Entry {
         this.id = id;
     }
 
-    public Term getEntry() {
+    @MapsId("entryId")
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "entry_id", nullable = false)
+    public Term getTerm() {
         return term;
     }
 
-    public void setEntry(Term term) {
+    public void setTerm(Term term) {
         this.term = term;
     }
 
+    @MapsId("defId")
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "def_id", nullable = false)
     public Definition getDef() {
         return def;
     }
@@ -48,6 +47,9 @@ public class Entry {
     public void setDef(Definition def) {
         this.def = def;
     }
+
+    @NotNull
+    @Column(name = "last_updated", nullable = false)
     public Instant getLastUpdated() {
         return lastUpdated;
     }
