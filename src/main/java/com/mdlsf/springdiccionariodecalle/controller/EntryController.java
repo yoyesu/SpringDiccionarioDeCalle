@@ -1,6 +1,7 @@
 package com.mdlsf.springdiccionariodecalle.controller;
 
 import com.mdlsf.springdiccionariodecalle.NoEntryMatchingIdFound;
+import com.mdlsf.springdiccionariodecalle.entities.Entry;
 import com.mdlsf.springdiccionariodecalle.entities.Term;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
 import com.mdlsf.springdiccionariodecalle.repos.TermRepository;
@@ -16,18 +17,18 @@ import java.util.List;
 public class EntryController {
 
     private TermRepository termRepository;
-    private EntryRepository entryDefRepository;
+    private EntryRepository entryRepository;
 
     @Autowired
     public EntryController(TermRepository termRepository, EntryRepository entryRepository) {
         this.termRepository = termRepository;
-        this.entryDefRepository = entryRepository;
+        this.entryRepository = entryRepository;
     }
 
     @GetMapping("/")
-    public List<Term> getLastTenEntries(){
-        List<Term> list = termRepository.findAll();
-        List<Term> smallerList = new ArrayList<>();
+    public ResponseEntity<List<Entry>>  getLastTenEntries(){
+        List<Entry> list = entryRepository.findAll();
+        List<Entry> smallerList = new ArrayList<>();
 
         int listSize = list.size() -1;
         for(int i = 0; i < 10; i++){
@@ -36,7 +37,7 @@ public class EntryController {
 
         }
 
-        return smallerList;
+        return new ResponseEntity<>(smallerList, HttpStatus.OK) ;
     }
 
     //TODO change return type to EntryDef
