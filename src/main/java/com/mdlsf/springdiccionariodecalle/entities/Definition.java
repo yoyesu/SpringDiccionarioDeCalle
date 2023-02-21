@@ -27,7 +27,7 @@ public class Definition {
 
     @NotNull
     @Column(name = "date_added", nullable = false)
-    private LocalDate dateAdded;
+    private Instant dateAdded = Instant.now();
 
     @Size(max = 45)
     @Column(name = "user_added", length = 45)
@@ -36,19 +36,6 @@ public class Definition {
     @Size(max = 45)
     @Column(name = "country_use", length = 45)
     private String countryUse;
-
-    @Column(name = "year_use")
-    private Integer yearUse;
-
-    @NotNull
-    @Column(name = "last_updated", nullable = false)
-    private Instant lastUpdated;
-
-    @ManyToMany
-    @JoinTable(name = "entry_def",
-            joinColumns = @JoinColumn(name = "def_id"),
-            inverseJoinColumns = @JoinColumn(name = "entry_id"))
-    private Set<Entry> entries = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -74,11 +61,11 @@ public class Definition {
         this.example = example;
     }
 
-    public LocalDate getDateAdded() {
+    public Instant getDateAdded() {
         return dateAdded;
     }
 
-    public void setDateAdded(LocalDate dateAdded) {
+    public void setDateAdded(Instant dateAdded) {
         this.dateAdded = dateAdded;
     }
 
@@ -96,30 +83,6 @@ public class Definition {
 
     public void setCountryUse(String countryUse) {
         this.countryUse = countryUse;
-    }
-
-    public Integer getYearUse() {
-        return yearUse;
-    }
-
-    public void setYearUse(Integer yearUse) {
-        this.yearUse = yearUse;
-    }
-
-    public Instant getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Instant lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
-    public Set<Entry> getEntries() {
-        return entries;
-    }
-
-    public void setEntries(Set<Entry> entries) {
-        this.entries = entries;
     }
 
 }
