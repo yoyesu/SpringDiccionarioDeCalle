@@ -1,7 +1,9 @@
 package com.mdlsf.springdiccionariodecalle.controller;
 
 import com.mdlsf.springdiccionariodecalle.NoMatchingIdFound;
+import com.mdlsf.springdiccionariodecalle.entities.Definition;
 import com.mdlsf.springdiccionariodecalle.entities.Entry;
+import com.mdlsf.springdiccionariodecalle.entities.EntryId;
 import com.mdlsf.springdiccionariodecalle.entities.Term;
 import com.mdlsf.springdiccionariodecalle.repos.DefinitionRepository;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
@@ -106,8 +108,20 @@ public class EntryController {
     }
 
     @PostMapping("/new")
-    public void addNewEntry(@RequestBody Term term){
-        termRepository.save(term);
+    public ResponseEntity<String> addNewEntry(@RequestBody Entry entry){
+        Entry entryToSave = new Entry();
+        EntryId entryId = new EntryId();
+        Term term = termRepository.save(entry.getTerm());
+        Definition def = definitionRepository.save(entry.getDef());
+
+        entryId.setEntryId(term.getId());
+        entryId.setDefId(def.getId());
+        entryToSave.setTerm(term);
+        entryToSave.setDef(def);
+        entryToSave.setId(entryId);
+        entryRepository.save(entryToSave);
+
+        return new ResponseEntity<>("New entry added successfully", HttpStatus.OK);
     }
 
     @PatchMapping("/update/{id}")

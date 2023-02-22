@@ -11,32 +11,17 @@ import java.util.Set;
 @Entity
 @Table(name = "definitions")
 public class Definition {
+    private Integer id;
+    private String definition;
+    private String example;
+    private Instant dateAdded = Instant.now();
+    private String userAdded;
+
+    private String countryUse;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "def_id", nullable = false)
-    private Integer id;
-
-    @NotNull
-    @Lob
-    @Column(name = "definition", nullable = false)
-    private String definition;
-
-    @Size(max = 255)
-    @Column(name = "example")
-    private String example;
-
-    @NotNull
-    @Column(name = "date_added", nullable = false)
-    private Instant dateAdded = Instant.now();
-
-    @Size(max = 45)
-    @Column(name = "user_added", length = 45)
-    private String userAdded;
-
-    @Size(max = 45)
-    @Column(name = "country_use", length = 45)
-    private String countryUse;
-
     public Integer getId() {
         return id;
     }
@@ -45,6 +30,9 @@ public class Definition {
         this.id = id;
     }
 
+    @NotNull
+    @Lob
+    @Column(name = "definition", nullable = false)
     public String getDefinition() {
         return definition;
     }
@@ -53,6 +41,8 @@ public class Definition {
         this.definition = definition;
     }
 
+    @Size(max = 255)
+    @Column(name = "example")
     public String getExample() {
         return example;
     }
@@ -61,6 +51,8 @@ public class Definition {
         this.example = example;
     }
 
+    @NotNull
+    @Column(name = "date_added", nullable = false)
     public Instant getDateAdded() {
         return dateAdded;
     }
@@ -69,6 +61,8 @@ public class Definition {
         this.dateAdded = dateAdded;
     }
 
+    @Size(max = 45)
+    @Column(name = "user_added", length = 45)
     public String getUserAdded() {
         return userAdded;
     }
@@ -77,6 +71,8 @@ public class Definition {
         this.userAdded = userAdded;
     }
 
+    @Size(max = 45)
+    @Column(name = "country_use", length = 45)
     public String getCountryUse() {
         return countryUse;
     }
