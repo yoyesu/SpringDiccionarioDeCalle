@@ -18,7 +18,7 @@ public class Term {
     private String entryName;
 
 
-    private Set<Definition> definitions = new LinkedHashSet<>();
+//    private Set<Definition> definitions = new LinkedHashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,17 +44,17 @@ public class Term {
 
 
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope= ServerRequest.class)
-    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    @JoinTable(name = "entries",
-            joinColumns = @JoinColumn(name = "entry_id"),
-            inverseJoinColumns = @JoinColumn(name = "def_id"))
-    public Set<Definition> getDefinitions() {
-        return definitions;
-    }
-
-    public void setDefinitions(Set<Definition> definitions) {
-        this.definitions = definitions;
-    }
+//    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope= ServerRequest.class)
+//    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+//    @JoinTable(name = "entries",
+//            joinColumns = @JoinColumn(name = "entry_id"),
+//            inverseJoinColumns = @JoinColumn(name = "def_id"))
+//    public Set<Definition> getDefinitions() {
+//        return definitions;
+//    }
+//
+//    public void setDefinitions(Set<Definition> definitions) {
+//        this.definitions = definitions;
+//    }
 
 }
