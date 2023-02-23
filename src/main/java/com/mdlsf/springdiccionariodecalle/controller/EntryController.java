@@ -1,5 +1,6 @@
 package com.mdlsf.springdiccionariodecalle.controller;
 
+import com.mdlsf.springdiccionariodecalle.NoEntryFoundForGivenParam;
 import com.mdlsf.springdiccionariodecalle.NoMatchingIdFound;
 import com.mdlsf.springdiccionariodecalle.entities.Definition;
 import com.mdlsf.springdiccionariodecalle.entities.Entry;
@@ -186,57 +187,39 @@ public class EntryController {
         return new ResponseEntity<>(names, HttpStatus.OK);
     }
 
-    @GetMapping("/contributor/{contributor}")
-    public ResponseEntity<?> getAllEntriesAddedByContributor(@PathVariable String contributor){
+    @GetMapping("/search-name/{word}")
+    public ResponseEntity<List<Entry>> getEntriesContainingXInTermName(@PathVariable String word){
+        if(word == null || word.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         List<Entry> entries = new ArrayList<>();
-        entries = getEntriesByDefinitionFieldContaining(entries, "contributor", contributor);
+        List<Term> terms = termRepository.findTermsByEntryNameContainsIgnoreCase(word);
+
+        if(terms.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        for(Term term : terms){
+            entries.addAll(entryRepository.findEntriesByTerm(term));
+        }
+        return new ResponseEntity<>(entries, HttpStatus.OK);
+    }
+
+    @GetMapping("/search-definition/{word}")
+    public ResponseEntity<List<Entry>> getEntriesContainingXInDefinition(@PathVariable String word){
+        if(word == null || word.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Entry> entries = new ArrayList<>();
+        entries = getEntriesByDefinitionFieldContaining(entries, "definition", word);
 
         if(entries.isEmpty()){
-            return new ResponseEntity<>("No entries found for that contributor.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>(entries, HttpStatus.OK);
     }
 
-    @GetMapping("/contributor/all")
-    public ResponseEntity<Set<String>> getAllContributors(){
-        Set<String> contributors = new HashSet<>();
-        for (Definition definition : definitionRepository.findAll()){
-            contributors.add(definition.getUserAdded());
-        }
-        return new ResponseEntity<>(contributors, HttpStatus.OK);
-    }
-
-    @GetMapping("/country/{country}")
-    public ResponseEntity<?> getAllEntriesByCountry(@PathVariable String country){
-        List<Entry> entries = new ArrayList<>();
-        entries = getEntriesByDefinitionFieldContaining(entries, "country", country);
-
-        if(entries.isEmpty()){
-            return new ResponseEntity<>("No entries found for that country.", HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(entries, HttpStatus.OK);
-    }
-
-    private List<Entry> getEntriesByDefinitionFieldContaining(List<Entry> entries, String field, String searchWord){
-
-        List<Definition> definitions = new ArrayList<>();
-        switch (field){
-            case "contributor" -> definitions = definitionRepository.findDefinitionsByUserAdded(searchWord); //NOT case-sensitive
-            case "country" -> definitions = definitionRepository.findDefinitionsByCountryUse(searchWord);
-        }
-
-        for(Definition definition : definitions){
-            entries.add(entryRepository.findEntryByDef(definition));
-        }
-
-        return entries;
-    }
-
-    //TODO GET all entries by country
-    //TODO GET entries that contain X in term name
-    //TODO GET entries that contain X in definition
     private static boolean isDefValidForUpdate(Entry entry, Entry entryToUpdate, Definition newDefinition, boolean hasBeenUpdated) {
 
         if(entry.getDef() == null){
@@ -262,6 +245,64 @@ public class EntryController {
             hasBeenUpdated = true;
         }
         return hasBeenUpdated;
+    }
+
+    @GetMapping("/contributor/{contributor}")
+    public ResponseEntity<?> getAllEntriesAddedByContributor(@PathVariable String contributor){
+        List<Entry> entries = new ArrayList<>();
+        entries = getEntriesByDefinitionFieldContaining(entries, "contributor", contributor);
+
+        if(entries.isEmpty()){
+            return new ResponseEntity<>("No entries found for that contributor.", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(entries, HttpStatus.OK);
+    }
+
+    @GetMapping("/contributor/all")
+    public ResponseEntity<Set<String>> getAllContributors(){
+        Set<String> contributors = new HashSet<>();
+        for (Definition definition : definitionRepository.findAll()){
+            contributors.add(definition.getUserAdded());
+        }
+        return new ResponseEntity<>(contributors, HttpStatus.OK);
+    }
+
+    @GetMapping("/country/all")
+    public ResponseEntity<Set<String>> getAllCountries(){
+        Set<String> countries = new HashSet<>();
+        for (Definition definition : definitionRepository.findAll()){
+            countries.add(definition.getCountryUse());
+        }
+        return new ResponseEntity<>(countries, HttpStatus.OK);
+    }
+
+    @GetMapping("/country/{country}")
+    public ResponseEntity<?> getAllEntriesByCountry(@PathVariable String country){
+        List<Entry> entries = new ArrayList<>();
+        entries = getEntriesByDefinitionFieldContaining(entries, "country", country);
+
+        if(entries.isEmpty()){
+            return new ResponseEntity<>("No entries found for that country.", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(entries, HttpStatus.OK);
+    }
+
+    private List<Entry> getEntriesByDefinitionFieldContaining(List<Entry> entries, String field, String searchWord){
+
+        List<Definition> definitions = new ArrayList<>();
+        switch (field){
+            case "contributor" -> definitions = definitionRepository.findDefinitionsByUserAdded(searchWord); //NOT case-sensitive
+            case "country" -> definitions = definitionRepository.findDefinitionsByCountryUse(searchWord);
+            case "definition" -> definitions = definitionRepository.findDefinitionsByDefinitionContainsIgnoreCase(searchWord);
+        }
+
+        for(Definition definition : definitions){
+            entries.add(entryRepository.findEntryByDef(definition));
+        }
+
+        return entries;
     }
 
     private static boolean isTermValidForUpdate(Entry entryToUpdate, Term newTerm, boolean hasBeenUpdated) {

@@ -10,4 +10,5 @@ public interface TermRepository extends JpaRepository<Term, Integer> {
     List<Term> getDictionariesByEntryNameIsStartingWith(String initial);
     boolean existsByEntryName(String name);
     Term findByEntryName(String name);
+    List<Term> findTermsByEntryNameContainsIgnoreCase(String searchParam);
 }
