@@ -184,8 +184,22 @@ public class EntryController {
         return new ResponseEntity<>(names, HttpStatus.OK);
     }
 
-    //TODO GET all entries written by X admin
-    //TODO POST method should call PATCH if there is already an entry with the same term name
+    @GetMapping("/contributor/{contributor}")
+    public ResponseEntity<?> getAllEntriesAddedBy(@PathVariable String contributor){
+        List<Entry> entries = new ArrayList<>();
+        List<Definition> definitions = definitionRepository.findDefinitionsByUserAdded(contributor); //NOT case-sensitive
+
+        if(definitions.isEmpty()){
+            return new ResponseEntity<>("No entries found for that contributor.", HttpStatus.BAD_REQUEST);
+        }
+
+        for(Definition definition : definitions){
+            entries.add(entryRepository.findEntryByDef(definition));
+        }
+
+        return new ResponseEntity<>(entries, HttpStatus.OK);
+    }
+
     //TODO GET all entries by country
     //TODO GET entries that contain X in term name
     //TODO GET entries that contain X in definition
