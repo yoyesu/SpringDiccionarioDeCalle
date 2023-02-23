@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class EntryController {
@@ -185,19 +187,51 @@ public class EntryController {
     }
 
     @GetMapping("/contributor/{contributor}")
-    public ResponseEntity<?> getAllEntriesAddedBy(@PathVariable String contributor){
+    public ResponseEntity<?> getAllEntriesAddedByContributor(@PathVariable String contributor){
         List<Entry> entries = new ArrayList<>();
-        List<Definition> definitions = definitionRepository.findDefinitionsByUserAdded(contributor); //NOT case-sensitive
+        entries = getEntriesByDefinitionFieldContaining(entries, "contributor", contributor);
 
-        if(definitions.isEmpty()){
+        if(entries.isEmpty()){
             return new ResponseEntity<>("No entries found for that contributor.", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(entries, HttpStatus.OK);
+    }
+
+    @GetMapping("/contributor/all")
+    public ResponseEntity<Set<String>> getAllContributors(){
+        Set<String> contributors = new HashSet<>();
+        for (Definition definition : definitionRepository.findAll()){
+            contributors.add(definition.getUserAdded());
+        }
+        return new ResponseEntity<>(contributors, HttpStatus.OK);
+    }
+
+    @GetMapping("/country/{country}")
+    public ResponseEntity<?> getAllEntriesByCountry(@PathVariable String country){
+        List<Entry> entries = new ArrayList<>();
+        entries = getEntriesByDefinitionFieldContaining(entries, "country", country);
+
+        if(entries.isEmpty()){
+            return new ResponseEntity<>("No entries found for that country.", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(entries, HttpStatus.OK);
+    }
+
+    private List<Entry> getEntriesByDefinitionFieldContaining(List<Entry> entries, String field, String searchWord){
+
+        List<Definition> definitions = new ArrayList<>();
+        switch (field){
+            case "contributor" -> definitions = definitionRepository.findDefinitionsByUserAdded(searchWord); //NOT case-sensitive
+            case "country" -> definitions = definitionRepository.findDefinitionsByCountryUse(searchWord);
         }
 
         for(Definition definition : definitions){
             entries.add(entryRepository.findEntryByDef(definition));
         }
 
-        return new ResponseEntity<>(entries, HttpStatus.OK);
+        return entries;
     }
 
     //TODO GET all entries by country

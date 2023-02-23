@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface DefinitionRepository extends JpaRepository<Definition, Integer> {
     List<Definition> findDefinitionsByUserAdded(String user);
+    List<Definition> findDefinitionsByCountryUse(String country);
 }
