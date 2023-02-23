@@ -110,9 +110,16 @@ public class EntryController {
 
     @PostMapping("/new")
     public ResponseEntity<String> addNewEntry(@RequestBody Entry entry){
+        Term term = entry.getTerm();
+
+        //if the term already exists we won't create a new term
+        if(termRepository.existsByEntryName(term.getEntryName())){
+            term = termRepository.findByEntryName(term.getEntryName());
+        } else {
+            termRepository.save(term);
+        }
         Entry entryToSave = new Entry();
         EntryId entryId = new EntryId();
-        Term term = termRepository.save(entry.getTerm());
         Definition def = definitionRepository.save(entry.getDef());
 
         entryId.setEntryId(term.getId());
