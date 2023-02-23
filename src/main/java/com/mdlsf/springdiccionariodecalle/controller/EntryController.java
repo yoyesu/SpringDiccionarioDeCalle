@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,38 +125,95 @@ public class EntryController {
         return new ResponseEntity<>("New entry added successfully", HttpStatus.OK);
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<?> updateEntry(@RequestBody Term term, @PathVariable int id){
-        if(term == null){
+    @PatchMapping("/update/{defId}")
+    public ResponseEntity<?> updateEntry(@RequestBody Entry entry, @PathVariable int defId){
+        if(entry == null){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
-        Term termToUpdate;
+
+        Entry entryToUpdate;
+        Term newTerm = entry.getTerm();
+        Definition newDefinition = entry.getDef();
         boolean hasBeenUpdated = false;
+
         try {
-            termToUpdate = termRepository.findById(id).
-                    orElseThrow(NoMatchingIdFound::new);
-
-            if(term.getEntryName() != null && !term.getEntryName().equals(termToUpdate.getEntryName()) && !term.getEntryName().isEmpty()){
-                termToUpdate.setEntryName(term.getEntryName());
-                hasBeenUpdated = true;
-            }
-
-//            if(term.getDefinitions() != null && !term.getDefinitions().isEmpty()){
-//                termToUpdate.setDefinitions(term.getDefinitions());
-//                hasBeenUpdated = true;
-//            }
+            entryToUpdate = entryRepository.findEntryByDef(definitionRepository.findById(defId).orElseThrow(NoMatchingIdFound::new));
+            boolean termIsValidForUpdate = isTermValidForUpdate(entryToUpdate, newTerm, false);
+            hasBeenUpdated =  termIsValidForUpdate || isDefValidForUpdate(entry, entryToUpdate, newDefinition, false);
 
             if(!hasBeenUpdated){
                 return new ResponseEntity<>("The entry provided matches the original entry.",HttpStatus.BAD_REQUEST);
             }
 
-            //TODO fix method to update the entryDef lastUpdated field
-//            entryToUpdate.setLastUpdated(Instant.now());
-            termRepository.save(termToUpdate);
+            entryToUpdate.setLastUpdated(Instant.now());
+
+            //updating the date for all the other entries with the same term id if the term was updated above
+            if(termIsValidForUpdate){
+                for(Entry otherEntry : entryRepository.findEntriesByTerm(termRepository.findById(entryToUpdate.getTerm().getId()).orElseThrow())){
+                    otherEntry.setLastUpdated(Instant.now());
+                }
+            }
+            entryRepository.save(entryToUpdate);
+
         } catch (NoMatchingIdFound e) {
-            return new ResponseEntity<>(e.getMessage(id), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(defId), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(termToUpdate, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(entryToUpdate, HttpStatus.OK);
+    }
+
+    @GetMapping("/browse/{character}")
+    public ResponseEntity<List<String>> getAllEntryNamesStartingWith(@PathVariable String character){
+        if(character == null || character.length() > 1){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<String> names = new ArrayList<>();
+        List<Term> termsMatchingInitial = termRepository.getDictionariesByEntryNameIsStartingWith(character); //IT'S NOT CASE SENSITIVE
+
+        for(Term term : termsMatchingInitial){
+
+            names.add(term.getEntryName());
+        }
+        return new ResponseEntity<>(names, HttpStatus.OK);
+    }
+
+    //TODO GET all entries written by X admin
+    //TODO POST method should call PATCH if there is already an entry with the same term name
+    //TODO GET all entries by country
+    //TODO GET entries that contain X in term name
+    //TODO GET entries that contain X in definition
+    private static boolean isDefValidForUpdate(Entry entry, Entry entryToUpdate, Definition newDefinition, boolean hasBeenUpdated) {
+
+        if(entry.getDef() == null){
+            return false;
+        }
+        if(!entry.getDef().getDefinition().isEmpty() && !newDefinition.getDefinition().equalsIgnoreCase(entryToUpdate.getDef().getDefinition())){
+            entryToUpdate.getDef().setDefinition(newDefinition.getDefinition());
+            hasBeenUpdated = true;
+        }
+
+        if(!entry.getDef().getExample().isEmpty() && !newDefinition.getExample().equalsIgnoreCase(entryToUpdate.getDef().getExample())){
+            entryToUpdate.getDef().setExample(newDefinition.getExample());
+            hasBeenUpdated = true;
+        }
+
+        if(!entry.getDef().getCountryUse().isEmpty() && !newDefinition.getCountryUse().equalsIgnoreCase(entryToUpdate.getDef().getCountryUse())){
+            entryToUpdate.getDef().setCountryUse(newDefinition.getCountryUse());
+            hasBeenUpdated = true;
+        }
+
+        if(!entry.getDef().getUserAdded().isEmpty() && !newDefinition.getUserAdded().equalsIgnoreCase(entryToUpdate.getDef().getUserAdded())){
+            entryToUpdate.getDef().setUserAdded(newDefinition.getUserAdded());
+            hasBeenUpdated = true;
+        }
+        return hasBeenUpdated;
+    }
+
+    private static boolean isTermValidForUpdate(Entry entryToUpdate, Term newTerm, boolean hasBeenUpdated) {
+        if(newTerm.getEntryName() != null && !newTerm.getEntryName().equalsIgnoreCase(entryToUpdate.getTerm().getEntryName()) && !newTerm.getEntryName().isEmpty()){
+            entryToUpdate.getTerm().setEntryName(newTerm.getEntryName());
+            hasBeenUpdated = true;
+        }
+        return hasBeenUpdated;
     }
 }
