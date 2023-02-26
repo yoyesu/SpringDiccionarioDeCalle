@@ -9,4 +9,5 @@ public interface DefinitionRepository extends JpaRepository<Definition, Integer>
     List<Definition> findDefinitionsByUserAdded(String user);
     List<Definition> findDefinitionsByCountryUse(String country);
     List<Definition> findDefinitionsByDefinitionContainsIgnoreCase(String searchParam);
+    List<Definition> findDefinitionsByExampleContainingIgnoreCase(String searchParam);
 }
