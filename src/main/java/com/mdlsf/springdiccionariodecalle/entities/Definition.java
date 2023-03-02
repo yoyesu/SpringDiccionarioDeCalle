@@ -14,10 +14,7 @@ public class Definition {
     private Integer id;
     private String definition;
     private String example;
-    private Instant dateAdded = Instant.now();
-    private String userAdded;
 
-    private String countryUse;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,36 +46,6 @@ public class Definition {
 
     public void setExample(String example) {
         this.example = example;
-    }
-
-    @NotNull
-    @Column(name = "date_added", nullable = false)
-    public Instant getDateAdded() {
-        return dateAdded;
-    }
-
-    public void setDateAdded(Instant dateAdded) {
-        this.dateAdded = dateAdded;
-    }
-
-    @Size(max = 45)
-    @Column(name = "user_added", length = 45)
-    public String getUserAdded() {
-        return userAdded;
-    }
-
-    public void setUserAdded(String userAdded) {
-        this.userAdded = userAdded;
-    }
-
-    @Size(max = 45)
-    @Column(name = "country_use", length = 45)
-    public String getCountryUse() {
-        return countryUse;
-    }
-
-    public void setCountryUse(String countryUse) {
-        this.countryUse = countryUse;
     }
 
 }

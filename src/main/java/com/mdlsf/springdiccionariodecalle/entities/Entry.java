@@ -2,6 +2,7 @@ package com.mdlsf.springdiccionariodecalle.entities;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.Instant;
 
 @Entity
@@ -15,6 +16,11 @@ public class Entry {
     private Definition def;
 
     private Instant lastUpdated = Instant.now();
+
+    private Instant dateAdded = Instant.now();
+    private User userAdded;
+
+    private Country countryUse;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EmbeddedId
@@ -56,6 +62,38 @@ public class Entry {
 
     public void setLastUpdated(Instant lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    @NotNull
+    @Column(name = "date_added", nullable = false)
+    public Instant getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(Instant dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    @OneToOne
+    @Size(max = 45)
+    @Column(name = "user_added", length = 45)
+    public User getUserAdded() {
+        return userAdded;
+    }
+
+    public void setUserAdded(User userAdded) {
+        this.userAdded = userAdded;
+    }
+
+    @OneToMany
+    @Size(max = 45)
+    @Column(name = "country_use", length = 45)
+    public Country getCountryUse() {
+        return countryUse;
+    }
+
+    public void setCountryUse(Country countryUse) {
+        this.countryUse = countryUse;
     }
 
 }

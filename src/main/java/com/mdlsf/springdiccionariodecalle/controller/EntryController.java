@@ -133,7 +133,8 @@ public class EntryController {
         return new ResponseEntity<>(entries, HttpStatus.OK);
     }
 
-    //TODO GET entries added from X date
+    //TODO GET entries added from X date (should addedDate be on the entry rather than definition?)
+    //TODO GET entries updated from X date
 
     @GetMapping("/contributor/all")
     public ResponseEntity<Set<String>> getAllContributors(){
