@@ -4,23 +4,19 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.util.Set;
 
 @Entity
 @Table(name = "entries")
 public class Entry {
 
     private EntryId id;
-
     private Term term;
-//TODO add last updated field (if any update is made to the entry or the definition, this date should be updated)
     private Definition def;
-
     private Instant lastUpdated = Instant.now();
-
     private Instant dateAdded = Instant.now();
     private User userAdded;
-
-    private Country countryUse;
+    private Set<Country> countryUse;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EmbeddedId
@@ -74,9 +70,8 @@ public class Entry {
         this.dateAdded = dateAdded;
     }
 
-    @OneToOne
-    @Size(max = 45)
-    @Column(name = "user_added", length = 45)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_added")
     public User getUserAdded() {
         return userAdded;
     }
@@ -85,14 +80,13 @@ public class Entry {
         this.userAdded = userAdded;
     }
 
-    @OneToMany
-    @Size(max = 45)
-    @Column(name = "country_use", length = 45)
-    public Country getCountryUse() {
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_use")
+    public Set<Country> getCountryUse() {
         return countryUse;
     }
 
-    public void setCountryUse(Country countryUse) {
+    public void setCountryUse(Set<Country> countryUse) {
         this.countryUse = countryUse;
     }
 

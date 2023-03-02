@@ -31,8 +31,8 @@ public class User {
         this.userName = userName;
     }
 
-    @OneToOne
-    @Column(name = "user_role")
+    @ManyToOne
+    @JoinColumn(name = "user_role")
     public Role getUserRole() {
         return userRole;
     }

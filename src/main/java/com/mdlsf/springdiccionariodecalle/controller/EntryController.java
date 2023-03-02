@@ -1,10 +1,7 @@
 package com.mdlsf.springdiccionariodecalle.controller;
 
+import com.mdlsf.springdiccionariodecalle.entities.*;
 import com.mdlsf.springdiccionariodecalle.exceptions.NoMatchingIdFound;
-import com.mdlsf.springdiccionariodecalle.entities.Definition;
-import com.mdlsf.springdiccionariodecalle.entities.Entry;
-import com.mdlsf.springdiccionariodecalle.entities.EntryId;
-import com.mdlsf.springdiccionariodecalle.entities.Term;
 import com.mdlsf.springdiccionariodecalle.repos.DefinitionRepository;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
 import com.mdlsf.springdiccionariodecalle.repos.TermRepository;
@@ -137,10 +134,10 @@ public class EntryController {
     //TODO GET entries updated from X date
 
     @GetMapping("/contributor/all")
-    public ResponseEntity<Set<String>> getAllContributors(){
-        Set<String> contributors = new HashSet<>();
-        for (Definition definition : definitionRepository.findAll()){
-            contributors.add(definition.getUserAdded());
+    public ResponseEntity<Set<User>> getAllContributors(){
+        Set<User> contributors = new HashSet<>();
+        for (Entry entry : entryRepository.findAll()){
+            contributors.add(entry.getUserAdded());
         }
         return new ResponseEntity<>(contributors, HttpStatus.OK);
     }
@@ -155,15 +152,6 @@ public class EntryController {
         }
 
         return new ResponseEntity<>(entries, HttpStatus.OK);
-    }
-
-    @GetMapping("/country/all")
-    public ResponseEntity<Set<String>> getAllCountries(){
-        Set<String> countries = new HashSet<>();
-        for (Definition definition : definitionRepository.findAll()){
-            countries.add(definition.getCountryUse());
-        }
-        return new ResponseEntity<>(countries, HttpStatus.OK);
     }
 
     @GetMapping("/country/{country}")
@@ -314,15 +302,6 @@ public class EntryController {
             hasBeenUpdated = true;
         }
 
-        if(!entry.getDef().getCountryUse().isEmpty() && !newDefinition.getCountryUse().equalsIgnoreCase(entryToUpdate.getDef().getCountryUse())){
-            entryToUpdate.getDef().setCountryUse(newDefinition.getCountryUse());
-            hasBeenUpdated = true;
-        }
-
-        if(!entry.getDef().getUserAdded().isEmpty() && !newDefinition.getUserAdded().equalsIgnoreCase(entryToUpdate.getDef().getUserAdded())){
-            entryToUpdate.getDef().setUserAdded(newDefinition.getUserAdded());
-            hasBeenUpdated = true;
-        }
         return hasBeenUpdated;
     }
 
