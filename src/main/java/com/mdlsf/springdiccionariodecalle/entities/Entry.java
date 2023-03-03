@@ -80,8 +80,8 @@ public class Entry {
         this.userAdded = userAdded;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_use")
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "entries_country_use")
     public Set<Country> getCountryUse() {
         return countryUse;
     }

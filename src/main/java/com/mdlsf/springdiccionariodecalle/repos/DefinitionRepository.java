@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface DefinitionRepository extends JpaRepository<Definition, Integer> {
-    List<Definition> findDefinitionsByUserAdded(String user);
-    List<Definition> findDefinitionsByCountryUse(String country);
     List<Definition> findDefinitionsByDefinitionContainsIgnoreCase(String searchParam);
     List<Definition> findDefinitionsByExampleContainingIgnoreCase(String searchParam);
 }

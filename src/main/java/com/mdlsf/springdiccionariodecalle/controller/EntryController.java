@@ -254,8 +254,6 @@ public class EntryController {
     //TODO GET entries added before X date
     //TODO GET entries added between X-Y dates
 
-    //TODO create a table for countries in DB
-
     @DeleteMapping("/remove/def/{id}")
     public ResponseEntity<String> deleteDefById(@PathVariable int id) {
         try {
@@ -309,8 +307,6 @@ public class EntryController {
 
         List<Definition> definitions = new ArrayList<>();
         switch (field){
-            case "contributor" -> definitions = definitionRepository.findDefinitionsByUserAdded(searchWord); //NOT case-sensitive
-            case "country" -> definitions = definitionRepository.findDefinitionsByCountryUse(searchWord);
             case "definition" -> definitions = definitionRepository.findDefinitionsByDefinitionContainsIgnoreCase(searchWord);
             case "example" -> definitions = definitionRepository.findDefinitionsByExampleContainingIgnoreCase(searchWord);
         }
