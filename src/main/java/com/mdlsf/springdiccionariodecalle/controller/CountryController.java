@@ -47,10 +47,9 @@ public class CountryController {
         return new ResponseEntity<>(names, HttpStatus.OK);
     }
 
-    @GetMapping("/statistics")
+    @GetMapping("/api/statistics")
     public ResponseEntity<Map<String, Long>> getCountOfEntriesPerCountry(){
 
-        entryRepository.findAll().forEach(entry -> System.out.println("size of list" + entry.getCountryUse().size()));
         Map<String, Long> entriesPerCountry = entryRepository.findAll().stream()
                 .flatMap(entry -> entry.getCountryUse().stream())
                 .collect(Collectors.groupingBy(Country::getCountry, Collectors.counting()));
