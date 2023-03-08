@@ -11,8 +11,7 @@ public class UserDetailsConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        //TODO complete the implementation of userDetailsService
-        // return an instance of your UserDetailsService implementation
+        return new MyUserDetailsService();
     }
 
     @Bean
