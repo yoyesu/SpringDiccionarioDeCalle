@@ -1,0 +1,264 @@
+swagger: '2.0'
+schemes:
+  - https
+host: diccionario-de-calle.swagger.io
+basePath: /v2
+info:
+  description: 'API layer to access database with Spanish slang'
+  version: 1.0.0
+  title: Diccionario de Calle
+  contact:
+    email: maria.losafo@gmail.com
+tags:
+  - name: country
+    description: Access to Spanish-speaking countries info
+  - name: entry
+    description: Access to dictionary entries
+securityDefinitions:
+  api_auth:
+    type: oauth2
+    authorizationUrl: 'some url'
+    flow: implicit
+    scopes:
+      'write:calle': add entries to dictionary
+      'read:calle': read entries from dictionary
+  api_key:
+    type: apiKey
+    name: api_key
+    in: header
+paths:
+  /countries:
+    get:
+      tags:
+        - country
+      summary: get all the countries
+      description: Get all the countries.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Accepted
+        '500':
+          description: Internal Server Error
+      security:
+        - api_auth:
+            - 'read:calle'
+  /countries/names:
+    get:
+      tags:
+        - country
+      summary: Get a list with the names of all countries
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+  /countries/entries/count:
+    get:
+      tags:
+        - country
+      summary: Get count of entries per country
+      description: ""
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+  /:
+    get:
+      tags:
+        - entry
+      summary: Get last ten entries
+      description: Returns a list of entries
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: []
+  /entries:
+    get:
+      tags:
+        - entry
+      summary: Get all entries
+      description: Returns a list of entries
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /search/{initial}:
+    get:
+      tags:
+        - entry
+      summary: Get entries matching the initial
+      description: Returns a list of entries
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /browse/{character}:
+    get:
+      tags:
+        - entry
+      summary: Get entry names starting with character
+      description: Returns a list of entry names
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /search-name/{word}:
+    get:
+      tags:
+        - entry
+      summary: Get entries containing the word in their name
+      description: Returns a list of entries
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /search-definition/{word}:
+    get:
+      tags:
+        - entry
+      summary: Get entries containing the word in their definition
+      description: Returns a list of entries
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /search-example/{word}:
+    get:
+      tags:
+        - entry
+      summary: Get entries containing the word in their examples
+      description: Returns a list of entries
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /contributors:
+    get:
+      tags:
+        - entry
+      summary: Get all contributors
+      description: Returns a set of users
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /contributor/{contributor}:
+    get:
+      tags:
+        - entry
+      summary: Get all entries added by contributor
+      description: Returns a list of entries
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /country/{country}:
+    get:
+      tags:
+        - entry
+      summary: Get all entries for one country
+      description: Returns a list of entries
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /new:
+    post:
+      tags:
+        - entry
+      summary: Add a new entry
+      description: Add a new entry to the dictionary
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: successful operation
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+definitions:
+  Mealplan:
+    type: object
+    properties:
+      week_range:
+        description: ""
+        type: string
+        example: "11/11/23-17/11/23"
+      meals:
+        description: ""
+        type: array
+        items:
+          type: string
+        example: ["food", "food2"]
+  Dish:
+    type: object
+    properties:
+      name:
+        description: name of the dish
+        type: string
+        example: "chips"
+      category:
+        description: food category
+        type: string
+        example: "potatoes"
