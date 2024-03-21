@@ -17,7 +17,7 @@ tags:
 securityDefinitions:
   api_auth:
     type: oauth2
-    authorizationUrl: 'some url'
+    authorizationUrl: 'https://some-url.com'
     flow: implicit
     scopes:
       'write:calle': add entries to dictionary
@@ -86,7 +86,7 @@ paths:
         '500':
           description: Internal Server Error
       security:
-        - api_key: []
+        - api_key: [ ]
   /entries:
     get:
       tags:
@@ -108,11 +108,19 @@ paths:
         - entry
       summary: Get entries matching the initial
       description: Returns a list of entries
+      parameters:
+        - name: initial
+          in: path
+          description: Initial of the entry name
+          required: true
+          type: string
       produces:
         - application/json
       responses:
         '200':
           description: successful operation
+        '404':
+          description: No entries found for given initial
         '500':
           description: Internal Server Error
       security:
@@ -123,11 +131,19 @@ paths:
         - entry
       summary: Get entry names starting with character
       description: Returns a list of entry names
+      parameters:
+        - name: character
+          in: path
+          description: Initial of the entry name
+          required: true
+          type: string
       produces:
         - application/json
       responses:
         '200':
           description: successful operation
+        '404':
+          description: No entries found for given character
         '500':
           description: Internal Server Error
       security:
@@ -138,11 +154,19 @@ paths:
         - entry
       summary: Get entries containing the word in their name
       description: Returns a list of entries
+      parameters:
+        - name: word
+          in: path
+          description: Word to be found in entry name
+          required: true
+          type: string
       produces:
         - application/json
       responses:
         '200':
           description: successful operation
+        '404':
+          description: No entries found
         '500':
           description: Internal Server Error
       security:
@@ -153,11 +177,19 @@ paths:
         - entry
       summary: Get entries containing the word in their definition
       description: Returns a list of entries
+      parameters:
+        - name: word
+          in: path
+          description: Word to be found in entry definition
+          required: true
+          type: string
       produces:
         - application/json
       responses:
         '200':
           description: successful operation
+        '404':
+          description: No entries found
         '500':
           description: Internal Server Error
       security:
@@ -168,11 +200,19 @@ paths:
         - entry
       summary: Get entries containing the word in their examples
       description: Returns a list of entries
+      parameters:
+        - name: word
+          in: path
+          description: Word to be found in entry example
+          required: true
+          type: string
       produces:
         - application/json
       responses:
         '200':
           description: successful operation
+        '404':
+          description: No entries found
         '500':
           description: Internal Server Error
       security:
@@ -198,11 +238,19 @@ paths:
         - entry
       summary: Get all entries added by contributor
       description: Returns a list of entries
+      parameters:
+        - name: contributor
+          in: path
+          description: Name of contributor
+          required: true
+          type: string
       produces:
         - application/json
       responses:
         '200':
           description: successful operation
+        '404':
+          description: No contributors found
         '500':
           description: Internal Server Error
       security:
@@ -213,11 +261,19 @@ paths:
         - entry
       summary: Get all entries for one country
       description: Returns a list of entries
+      parameters:
+        - name: country
+          in: path
+          description: Country name
+          required: true
+          type: string
       produces:
         - application/json
       responses:
         '200':
           description: successful operation
+        '404':
+          description: No entries found
         '500':
           description: Internal Server Error
       security:
@@ -228,37 +284,150 @@ paths:
         - entry
       summary: Add a new entry
       description: Add a new entry to the dictionary
+      parameters:
+        - name: body
+          in: body
+          description: Entry information
+          required: true
+          schema:
+            $ref: "#/definitions/Entry"
       produces:
         - application/json
       responses:
         '201':
           description: successful operation
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /update/{defId}:
+    patch:
+      tags:
+        - entry
+      summary: Update an entry
+      description: Update one entry by Id
+      parameters:
+        - name: body
+          in: body
+          description: Entry information
+          required: true
+          schema:
+            $ref: "#/definitions/Entry"
+        - name: defId
+          in: path
+          required: true
+          type: number
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: successful operation
+        '404':
+          description: Entry not found
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /remove/{id}:
+    delete:
+      tags:
+        - entry
+      summary: Remove an entry
+      description: Remove one entry by Id
+      parameters:
+        - name: id
+          in: path
+          description: Id of entry
+          required: true
+          type: number
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: successful operation
+        '404':
+          description: Entry not found
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /remove/def/{id}:
+    delete:
+      tags:
+        - entry
+      summary: Remove a definition
+      description: Remove one definition by Id
+      parameters:
+        - name: id
+          in: path
+          description: Id of definition
+          required: true
+          type: number
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: successful operation
+        '404':
+          description: Entry not found
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: [ ]
+  /remove/term/{id}:
+    delete:
+      tags:
+        - entry
+      summary: Remove a term
+      description: Remove one term by Id
+      parameters:
+        - name: id
+          in: path
+          description: Id of term
+          required: true
+          type: number
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: successful operation
+        '404':
+          description: Entry not found
         '500':
           description: Internal Server Error
       security:
         - api_key: [ ]
 definitions:
-  Mealplan:
+  Entry:
     type: object
     properties:
-      week_range:
-        description: ""
+      term:
+        description: "name of the entry"
         type: string
-        example: "11/11/23-17/11/23"
-      meals:
-        description: ""
+        example: "Dog"
+      definition:
+        $ref: "#/definitions/Definition"
+      userAdded:
+        $ref: "#/definitions/User"
+      countryUse:
         type: array
         items:
           type: string
-        example: ["food", "food2"]
-  Dish:
+  Definition:
     type: object
     properties:
-      name:
-        description: name of the dish
+      definition:
+        description: "explanation of the term"
         type: string
-        example: "chips"
-      category:
-        description: food category
+        example: "A four-legged animal that barks"
+      example:
+        description: "A sentence that reflects how the term is used"
         type: string
-        example: "potatoes"
+        example: "I walk my dog every day."
+  User:
+    type: object
+    properties:
+      userName:
+        type: string
