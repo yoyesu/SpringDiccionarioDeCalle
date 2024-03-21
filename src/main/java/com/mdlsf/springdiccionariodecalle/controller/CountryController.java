@@ -47,7 +47,7 @@ public class CountryController {
         return new ResponseEntity<>(names, HttpStatus.OK);
     }
 
-    @GetMapping("/api/statistics")
+    @GetMapping("/entries/count")
     public ResponseEntity<Map<String, Long>> getCountOfEntriesPerCountry(){
 
         Map<String, Long> entriesPerCountry = entryRepository.findAll().stream()

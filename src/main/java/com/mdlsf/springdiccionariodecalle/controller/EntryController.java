@@ -48,7 +48,7 @@ public class EntryController {
         return new ResponseEntity<>(smallerList, HttpStatus.OK) ;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/entries")
     public ResponseEntity<List<Entry>> getAllEntries(){
         return new ResponseEntity<>(entryRepository.findAll(), HttpStatus.OK);
     }
@@ -134,10 +134,11 @@ public class EntryController {
     //TODO GET entries added from X date (should addedDate be on the entry rather than definition?)
     //TODO GET entries updated from X date
 
-    @GetMapping("/contributor/all")
+    @GetMapping("/contributors")
     public ResponseEntity<Set<User>> getAllContributors(){
         Set<User> contributors = new HashSet<>();
         for (Entry entry : entryRepository.findAll()){
+            // TODO return only the names of the users
             contributors.add(entry.getUserAdded());
         }
         return new ResponseEntity<>(contributors, HttpStatus.OK);
@@ -188,7 +189,7 @@ public class EntryController {
         entryToSave.setId(entryId);
         entryRepository.save(entryToSave);
 
-        return new ResponseEntity<>("New entry added successfully", HttpStatus.OK);
+        return new ResponseEntity<>("New entry added successfully", HttpStatus.CREATED);
     }
     @PatchMapping("/update/{defId}")
     public ResponseEntity<?> updateEntry(@RequestBody Entry entry, @PathVariable int defId){
