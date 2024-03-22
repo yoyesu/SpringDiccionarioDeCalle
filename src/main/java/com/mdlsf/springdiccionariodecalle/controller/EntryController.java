@@ -6,18 +6,12 @@ import com.mdlsf.springdiccionariodecalle.repos.DefinitionRepository;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
 import com.mdlsf.springdiccionariodecalle.repos.TermRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 public class EntryController {
@@ -52,121 +46,6 @@ public class EntryController {
     public ResponseEntity<List<Entry>> getAllEntries(){
         return new ResponseEntity<>(entryRepository.findAll(), HttpStatus.OK);
     }
-    @GetMapping("/search/{initial}")
-    public ResponseEntity<List<List<Entry>>> getEntriesByInitial(@PathVariable String initial){
-        if(isStringNullOrLongerThanOne(initial)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        List<List<Entry>> list = new ArrayList<>();
-
-        for(Term term : getAllTermsStartingWithCharacter(initial)){
-
-            list.add(entryRepository.findEntriesByTerm(term));
-        }
-
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
-
-    @GetMapping("/browse/{character}")
-    public ResponseEntity<List<String>> getAllEntryNamesStartingWith(@PathVariable String character){
-        if(isStringNullOrLongerThanOne(character)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        List<String> names = new ArrayList<>();
-
-        for(Term term : getAllTermsStartingWithCharacter(character)){
-
-            names.add(term.getEntryName());
-        }
-        return new ResponseEntity<>(names, HttpStatus.OK);
-    }
-
-    @GetMapping("/search-name/{word}")
-    public ResponseEntity<List<Entry>> getEntriesContainingXInTermName(@PathVariable String word){
-        if(word == null || word.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        List<Entry> entries = new ArrayList<>();
-        List<Term> terms = termRepository.findTermsByEntryNameContainsIgnoreCase(word);
-
-        if(terms.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        for(Term term : terms){
-            entries.addAll(entryRepository.findEntriesByTerm(term));
-        }
-        return new ResponseEntity<>(entries, HttpStatus.OK);
-    }
-
-    @GetMapping("/search-definition/{word}")
-    public ResponseEntity<List<Entry>> getEntriesContainingXInDefinition(@PathVariable String word){
-        if(word == null || word.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        List<Entry> entries = new ArrayList<>();
-        entries = getEntriesByDefinitionFieldContaining(entries, "definition", word);
-
-        if(entries.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(entries, HttpStatus.OK);
-    }
-
-    @GetMapping("/search-example/{word}")
-    public ResponseEntity<List<Entry>> getEntriesContainingXInExample(@PathVariable String word){
-        if(word == null || word.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        List<Entry> entries = new ArrayList<>();
-        entries = getEntriesByDefinitionFieldContaining(entries, "example", word);
-
-        if(entries.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(entries, HttpStatus.OK);
-    }
-
-    //TODO GET entries added from X date (should addedDate be on the entry rather than definition?)
-    //TODO GET entries updated from X date
-
-    @GetMapping("/contributors")
-    public ResponseEntity<Set<User>> getAllContributors(){
-        Set<User> contributors = new HashSet<>();
-        for (Entry entry : entryRepository.findAll()){
-            // TODO return only the names of the users
-            contributors.add(entry.getUserAdded());
-        }
-        return new ResponseEntity<>(contributors, HttpStatus.OK);
-    }
-
-    @GetMapping("/contributor/{contributor}")
-    public ResponseEntity<?> getAllEntriesAddedByContributor(@PathVariable String contributor){
-        List<Entry> entries = new ArrayList<>();
-        entries = getEntriesByDefinitionFieldContaining(entries, "contributor", contributor);
-
-        if(entries.isEmpty()){
-            return new ResponseEntity<>("No entries found for that contributor.", HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(entries, HttpStatus.OK);
-    }
-
-    @GetMapping("/country/{country}")
-    public ResponseEntity<?> getAllEntriesByCountry(@PathVariable String country){
-        List<Entry> entries = new ArrayList<>();
-        entries = getEntriesByDefinitionFieldContaining(entries, "country", country);
-
-        if(entries.isEmpty()){
-            return new ResponseEntity<>("No entries found for that country.", HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(entries, HttpStatus.OK);
-    }
 
     @PostMapping("/new")
     public ResponseEntity<String> addNewEntry(@RequestBody Entry entry){
@@ -191,42 +70,6 @@ public class EntryController {
 
         return new ResponseEntity<>("New entry added successfully", HttpStatus.CREATED);
     }
-    @PatchMapping("/update/{defId}")
-    public ResponseEntity<?> updateEntry(@RequestBody Entry entry, @PathVariable int defId){
-        if(entry == null){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-
-        Entry entryToUpdate;
-        Term newTerm = entry.getTerm();
-        Definition newDefinition = entry.getDef();
-        boolean hasBeenUpdated = false;
-
-        try {
-            entryToUpdate = entryRepository.findEntryByDef(definitionRepository.findById(defId).orElseThrow(NoMatchingIdFound::new));
-            boolean termIsValidForUpdate = isTermValidForUpdate(entryToUpdate, newTerm, false);
-            hasBeenUpdated =  termIsValidForUpdate || isDefValidForUpdate(entry, entryToUpdate, newDefinition, false);
-
-            if(!hasBeenUpdated){
-                return new ResponseEntity<>("The entry provided matches the original entry.",HttpStatus.BAD_REQUEST);
-            }
-
-            entryToUpdate.setLastUpdated(Instant.now());
-
-            //updating the date for all the other entries with the same term id if the term was updated above
-            if(termIsValidForUpdate){
-                for(Entry otherEntry : entryRepository.findEntriesByTerm(termRepository.findById(entryToUpdate.getTerm().getId()).orElseThrow())){
-                    otherEntry.setLastUpdated(Instant.now());
-                }
-            }
-            entryRepository.save(entryToUpdate);
-
-        } catch (NoMatchingIdFound e) {
-            return new ResponseEntity<>(e.getMessage(defId), HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(entryToUpdate, HttpStatus.OK);
-    }
 
     @DeleteMapping("/remove/{id}")
     public ResponseEntity<String> deleteAllEntriesMatchingTermId(@PathVariable int id) {
@@ -249,36 +92,6 @@ public class EntryController {
         }
 
         return new ResponseEntity<>("Entry with id " + id + " has been removed successfully.", HttpStatus.OK);
-    }
-
-    //TODO test delete methods
-
-    //TODO GET entries added before X date
-    //TODO GET entries added between X-Y dates
-
-    @Secured("ROLE_ADMIN")
-    @DeleteMapping("/remove/def/{id}")
-    public ResponseEntity<String> deleteDefById(@PathVariable int id) {
-        try {
-            definitionRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e){
-            return new ResponseEntity<>(new NoMatchingIdFound().getMessage(id), HttpStatus.BAD_REQUEST);
-
-        }
-
-        return new ResponseEntity<>("Definition with id " + id + " has been removed successfully.", HttpStatus.OK);
-    }
-
-    @DeleteMapping("/remove/term/{id}")
-    public ResponseEntity<String> deleteTermById(@PathVariable int id) {
-        try {
-            termRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e){
-            return new ResponseEntity<>(new NoMatchingIdFound().getMessage(id), HttpStatus.BAD_REQUEST);
-
-        }
-
-        return new ResponseEntity<>("Term with id " + id + " has been removed successfully.", HttpStatus.OK);
     }
 
     private List<Term> getAllTermsStartingWithCharacter(String character){
