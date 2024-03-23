@@ -1,8 +1,7 @@
 package com.mdlsf.springdiccionariodecalle.entities;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Set;
 

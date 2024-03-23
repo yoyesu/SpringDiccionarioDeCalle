@@ -1,6 +1,6 @@
 package com.mdlsf.springdiccionariodecalle.entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")

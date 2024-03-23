@@ -5,6 +5,7 @@ import com.mdlsf.springdiccionariodecalle.exceptions.NoMatchingIdFound;
 import com.mdlsf.springdiccionariodecalle.repos.DefinitionRepository;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
 import com.mdlsf.springdiccionariodecalle.repos.TermRepository;
+import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+@RequestMapping("/entries")
 @RestController
 public class EntryController {
 
@@ -28,26 +31,16 @@ public class EntryController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<Entry>>  getLastTenEntries(){
-        List<Entry> list = entryRepository.findAll();
-        List<Entry> smallerList = new ArrayList<>();
-
-        int listSize = list.size() -1;
-        for(int i = 0; i < 10; i++){
-
-            smallerList.add(list.get(listSize--));
+    public ResponseEntity<List<Entry>> getAllEntries(@RequestParam @Nullable Integer entryLimit){
+        if (entryLimit != null) {
 
         }
-
-        return new ResponseEntity<>(smallerList, HttpStatus.OK) ;
-    }
-
-    @GetMapping("/entries")
-    public ResponseEntity<List<Entry>> getAllEntries(){
         return new ResponseEntity<>(entryRepository.findAll(), HttpStatus.OK);
     }
 
-    @PostMapping("/new")
+
+
+    @PostMapping("/")
     public ResponseEntity<String> addNewEntry(@RequestBody Entry entry){
         Term term = entry.getTerm();
         //TODO add more validation to the entry (check term name is not empty, etc)
@@ -71,7 +64,7 @@ public class EntryController {
         return new ResponseEntity<>("New entry added successfully", HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/remove/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAllEntriesMatchingTermId(@PathVariable int id) {
 
         //TODO find out why this method is not working, but the other delete methods are
@@ -123,8 +116,10 @@ public class EntryController {
 
         List<Definition> definitions = new ArrayList<>();
         switch (field){
-            case "definition" -> definitions = definitionRepository.findDefinitionsByDefinitionContainsIgnoreCase(searchWord);
-            case "example" -> definitions = definitionRepository.findDefinitionsByExampleContainingIgnoreCase(searchWord);
+            case "definition" -> definitions =
+                    definitionRepository.findDefinitionsByDefinitionContainsIgnoreCase(searchWord);
+            case "example" -> definitions =
+                    definitionRepository.findDefinitionsByExampleContainingIgnoreCase(searchWord);
         }
 
         for(Definition definition : definitions){

@@ -11,6 +11,7 @@ import java.util.List;
 public interface EntryRepository extends JpaRepository<Entry, Integer> {
     List<Entry> findEntriesByTerm(Term term);
     Entry findEntryByDef(Definition def);
+    List<Entry> findEntriesByDateAddedBefore(Instant date);
     List<Entry> findEntriesByLastUpdatedAfter(Instant date);
     List<Entry> findEntriesByLastUpdatedBefore(Instant date);
     List<Entry> findEntriesByLastUpdatedBetween(Instant startingDate, Instant endingDate);
