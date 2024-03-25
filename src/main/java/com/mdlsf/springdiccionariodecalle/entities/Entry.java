@@ -2,9 +2,18 @@ package com.mdlsf.springdiccionariodecalle.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.time.Instant;
 import java.util.Set;
 
+@Builder
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "entries")
 public class Entry {

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequestMapping("/entries")
 @RestController
@@ -32,42 +31,45 @@ public class EntryController {
 
     @GetMapping("/")
     public ResponseEntity<List<Entry>> getAllEntries(@RequestParam @Nullable Integer entryLimit){
-        if (entryLimit != null) {
+        List<Entry> allEntries = entryRepository.findAll();
 
+        if (entryLimit != null) {
+            int entriesSize = allEntries.size();
+            int startingIndex = entryLimit > entriesSize ? 0 : entriesSize - entryLimit;
+            return new ResponseEntity<>(allEntries.subList(startingIndex,entriesSize), HttpStatus.OK);
         }
-        return new ResponseEntity<>(entryRepository.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(allEntries, HttpStatus.OK);
     }
 
 
 
     @PostMapping("/")
     public ResponseEntity<String> addNewEntry(@RequestBody Entry entry){
-        Term term = entry.getTerm();
-        //TODO add more validation to the entry (check term name is not empty, etc)
-        //if the term already exists we won't create a new term
-        if(termRepository.existsByEntryName(term.getEntryName())){
-            term = termRepository.findByEntryName(term.getEntryName());
-        } else {
-            termRepository.save(term);
-        }
-        Entry entryToSave = new Entry();
-        EntryId entryId = new EntryId();
-        Definition def = definitionRepository.save(entry.getDef());
-
-        entryId.setEntryId(term.getId());
-        entryId.setDefId(def.getId());
-        entryToSave.setTerm(term);
-        entryToSave.setDef(def);
-        entryToSave.setId(entryId);
-        entryRepository.save(entryToSave);
-
+        System.out.println("hi");
+//        Term term = entry.getTerm();
+//        //TODO add more validation to the entry (check term name is not empty, etc)
+//        //if the term already exists we won't create a new term
+//        if(termRepository.existsByEntryName(term.getEntryName())){
+//            term = termRepository.findByEntryName(term.getEntryName());
+//        } else {
+//            termRepository.save(term);
+//        }
+//        Entry entryToSave = new Entry();
+//        EntryId entryId = new EntryId();
+//        Definition def = definitionRepository.save(entry.getDef());
+//
+//        entryId.setEntryId(term.getId());
+//        entryId.setDefId(def.getId());
+//        entryToSave.setTerm(term);
+//        entryToSave.setDef(def);
+//        entryToSave.setId(entryId);
+//        entryRepository.save(entryToSave);
+//
         return new ResponseEntity<>("New entry added successfully", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAllEntriesMatchingTermId(@PathVariable int id) {
-
-        //TODO find out why this method is not working, but the other delete methods are
         if(id < 0){
             return new ResponseEntity<>(new NoMatchingIdFound().getMessage(id), HttpStatus.BAD_REQUEST);
         }

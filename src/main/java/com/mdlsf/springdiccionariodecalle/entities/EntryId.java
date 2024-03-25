@@ -3,11 +3,17 @@ package com.mdlsf.springdiccionariodecalle.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Embeddable
 public class EntryId implements Serializable {
     private static final long serialVersionUID = 2969364269986936979L;
@@ -18,22 +24,6 @@ public class EntryId implements Serializable {
     @NotNull
     @Column(name = "def_id", nullable = false)
     private Integer defId;
-
-    public Integer getEntryId() {
-        return entryId;
-    }
-
-    public void setEntryId(Integer entryId) {
-        this.entryId = entryId;
-    }
-
-    public Integer getDefId() {
-        return defId;
-    }
-
-    public void setDefId(Integer defId) {
-        this.defId = defId;
-    }
 
     @Override
     public boolean equals(Object o) {

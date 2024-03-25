@@ -3,7 +3,11 @@ package com.mdlsf.springdiccionariodecalle.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "terms")
 public class Term {
