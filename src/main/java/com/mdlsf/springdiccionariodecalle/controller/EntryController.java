@@ -2,7 +2,6 @@ package com.mdlsf.springdiccionariodecalle.controller;
 
 import com.mdlsf.springdiccionariodecalle.entities.*;
 import com.mdlsf.springdiccionariodecalle.exceptions.NoMatchingIdFound;
-import com.mdlsf.springdiccionariodecalle.repos.DefinitionRepository;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
 import com.mdlsf.springdiccionariodecalle.repos.TermRepository;
 import jakarta.annotation.Nullable;
@@ -18,15 +17,11 @@ import java.util.List;
 @RestController
 public class EntryController {
 
-    private TermRepository termRepository;
     private EntryRepository entryRepository;
-    private DefinitionRepository definitionRepository;
 
     @Autowired
-    public EntryController(TermRepository termRepository, EntryRepository entryRepository, DefinitionRepository definitionRepository) {
-        this.termRepository = termRepository;
+    public EntryController(EntryRepository entryRepository) {
         this.entryRepository = entryRepository;
-        this.definitionRepository = definitionRepository;
     }
 
     @GetMapping("/")

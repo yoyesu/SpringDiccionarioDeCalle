@@ -1,5 +1,7 @@
 package com.mdlsf.springdiccionariodecalle.entities;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,43 +20,42 @@ import java.util.Set;
 @Table(name = "entries")
 public class Entry {
 
-    private EntryId id;
-    private Term term;
-    private Definition def;
+    private Integer id;
+    private String term;
+    private String def;
     private Instant lastUpdated = Instant.now();
     private Instant dateAdded = Instant.now();
-    private User userAdded;
-    private Set<Country> countryUse;
+    private String userAdded;
+    private Set<String> countryUse;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EmbeddedId
-    public EntryId getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(EntryId id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     @MapsId("entryId")
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "entry_id", nullable = false)
-    public Term getTerm() {
+    public String getTerm() {
         return term;
     }
 
-    public void setTerm(Term term) {
+    public void setTerm(String term) {
         this.term = term;
     }
 
     @MapsId("defId")
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "def_id", nullable = false)
-    public Definition getDef() {
+    public String getDef() {
         return def;
     }
 
-    public void setDef(Definition def) {
+    public void setDef(String def) {
         this.def = def;
     }
 
@@ -80,21 +81,20 @@ public class Entry {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_added")
-    public User getUserAdded() {
+    public String getUserAdded() {
         return userAdded;
     }
 
-    public void setUserAdded(User userAdded) {
+    public void setUserAdded(String userAdded) {
         this.userAdded = userAdded;
     }
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "entries_country_use")
-    public Set<Country> getCountryUse() {
+    public Set<String> getCountryUse() {
         return countryUse;
     }
 
-    public void setCountryUse(Set<Country> countryUse) {
+    public void setCountryUse(Set<String> countryUse) {
         this.countryUse = countryUse;
     }
 

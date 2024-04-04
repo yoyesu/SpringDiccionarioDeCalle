@@ -1,7 +1,5 @@
 //package com.mdlsf.springdiccionariodecalle.security;
 //
-//import com.mdlsf.springdiccionariodecalle.entities.User;
-//import com.mdlsf.springdiccionariodecalle.repos.UserRepository;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,7 +1,5 @@
 //package com.mdlsf.springdiccionariodecalle.security;
 //
-//import com.mdlsf.springdiccionariodecalle.entities.Role;
-//import com.mdlsf.springdiccionariodecalle.entities.User;
 //import org.springframework.security.core.GrantedAuthority;
 //import org.springframework.security.core.authority.SimpleGrantedAuthority;
 //import org.springframework.security.core.userdetails.UserDetails;
