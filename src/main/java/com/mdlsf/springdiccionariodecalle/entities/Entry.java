@@ -1,7 +1,5 @@
 package com.mdlsf.springdiccionariodecalle.entities;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -29,7 +27,7 @@ public class Entry {
     private Set<String> countryUse;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EmbeddedId
+    @Id
     public Integer getId() {
         return id;
     }
@@ -38,9 +36,6 @@ public class Entry {
         this.id = id;
     }
 
-    @MapsId("entryId")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "entry_id", nullable = false)
     public String getTerm() {
         return term;
     }
@@ -49,8 +44,7 @@ public class Entry {
         this.term = term;
     }
 
-    @MapsId("defId")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+
     public String getDef() {
         return def;
     }
@@ -79,8 +73,6 @@ public class Entry {
         this.dateAdded = dateAdded;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_added")
     public String getUserAdded() {
         return userAdded;
     }
@@ -89,7 +81,6 @@ public class Entry {
         this.userAdded = userAdded;
     }
 
-    @ManyToMany(fetch = FetchType.EAGER)
     public Set<String> getCountryUse() {
         return countryUse;
     }

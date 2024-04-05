@@ -1,12 +1,7 @@
 package com.mdlsf.springdiccionariodecalle.controller;
 
-import com.mdlsf.springdiccionariodecalle.entities.Definition;
 import com.mdlsf.springdiccionariodecalle.entities.Entry;
-import com.mdlsf.springdiccionariodecalle.entities.EntryId;
-import com.mdlsf.springdiccionariodecalle.entities.Term;
-import com.mdlsf.springdiccionariodecalle.repos.DefinitionRepository;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
-import com.mdlsf.springdiccionariodecalle.repos.TermRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -19,11 +14,9 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -32,12 +25,6 @@ public class EntryControllerTests {
 
     @MockBean(EntryRepository.class)
     private EntryRepository entryRepository;
-
-    @MockBean(DefinitionRepository.class)
-    private DefinitionRepository definitionRepository;
-
-    @MockBean(TermRepository.class)
-    private TermRepository termRepository;
 
     @Autowired
     private EntryController entryController;
@@ -77,17 +64,11 @@ public class EntryControllerTests {
     @Test
     public void testAnEntryIsDeleted() {
         List<Entry> entries = new ArrayList<>();
-        Term term = Term.builder().id(1).build();
-        Definition def = Definition.builder().id(1).build();
-        Entry entry = Entry.builder().term(term).def(def).build();
+        Entry entry = Entry.builder().id(1).term("something").def("some meaning").build();
         entries.add(entry);
 
-        when(termRepository.findById(1)).thenReturn(Optional.of(term));
-        when(entryRepository.findEntriesByTerm(term)).thenReturn(entries);
-
         ResponseEntity<String> responseEntity = entryController.deleteAllEntriesMatchingTermId(1);
-        verify(definitionRepository, times(entries.size())).deleteById(any());
-        verify(termRepository, times(1)).deleteById(1);
+        verify(entryRepository, times(1)).deleteById(1);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("Entry with id 1 has been removed successfully.", responseEntity.getBody());
     }
@@ -95,10 +76,15 @@ public class EntryControllerTests {
     @Test
     public void testANewEntryIsAdded() {
         List<Entry> entries = new ArrayList<>();
-        Entry entry = Entry.builder().id(EntryId.builder().entryId(1).defId(1).build()).build();
+        Entry entry = Entry.builder().id(1).build();
         given(this.entryRepository.findAll()).willReturn(entries);
-        entryController.addNewEntry(entry);
-        assertEquals(1, entries.size());
+
+        ResponseEntity<String> responseEntity = entryController.addNewEntry(entry);
+
+        verify(entryRepository, times(1)).save(entry);
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        assertEquals("New entry added successfully", responseEntity.getBody());
+
     }
 
     private List<Entry> buildRepositoryWithEmptyEntries(int numberOfEntries) {
