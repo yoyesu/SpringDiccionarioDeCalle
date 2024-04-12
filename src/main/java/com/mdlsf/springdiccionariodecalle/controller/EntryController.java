@@ -1,7 +1,6 @@
 package com.mdlsf.springdiccionariodecalle.controller;
 
 import com.mdlsf.springdiccionariodecalle.entities.*;
-import com.mdlsf.springdiccionariodecalle.exceptions.NoMatchingIdFound;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/entries")
@@ -38,23 +36,24 @@ public class EntryController {
 
 
     @PostMapping("/")
-    public ResponseEntity<String> addNewEntry(@RequestBody Entry entry){
+    public ResponseEntity<String> addNewEntry(@RequestBody NewEntryRequest entryRequest){
+        Entry entry = Entry.builder()
+                .def(entryRequest.getDef())
+                .term(entryRequest.getTerm())
+                .countryUse(entryRequest.getCountryUse())
+                .build();
+
         entryRepository.save(entry);
 
         return new ResponseEntity<>("New entry added successfully", HttpStatus.CREATED);
     }
 
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAllEntriesMatchingTermId(@PathVariable int id) {
-        if(id < 0){
-            return new ResponseEntity<>(new NoMatchingIdFound().getMessage(id), HttpStatus.BAD_REQUEST);
-        }
         entryRepository.deleteById(id);
 
         return new ResponseEntity<>("Entry with id " + id + " has been removed successfully.", HttpStatus.OK);
     }
 
-    private boolean isStringNullOrLongerThanOne(String phrase){
-        return phrase == null || phrase.length() > 1;
-    }
 }

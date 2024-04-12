@@ -1,6 +1,7 @@
 package com.mdlsf.springdiccionariodecalle.controller;
 
 import com.mdlsf.springdiccionariodecalle.entities.Entry;
+import com.mdlsf.springdiccionariodecalle.entities.NewEntryRequest;
 import com.mdlsf.springdiccionariodecalle.repos.EntryRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,10 +65,6 @@ public class EntryControllerTests {
     }
     @Test
     public void testAnEntryIsDeleted() {
-        List<Entry> entries = new ArrayList<>();
-        Entry entry = Entry.builder().id(1).term("something").def("some meaning").build();
-        entries.add(entry);
-
         ResponseEntity<String> responseEntity = entryController.deleteAllEntriesMatchingTermId(1);
         verify(entryRepository, times(1)).deleteById(1);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -76,12 +74,14 @@ public class EntryControllerTests {
     @Test
     public void testANewEntryIsAdded() {
         List<Entry> entries = new ArrayList<>();
-        Entry entry = Entry.builder().id(1).build();
         given(this.entryRepository.findAll()).willReturn(entries);
+        NewEntryRequest newEntryRequest = NewEntryRequest.builder()
+                .term("some term")
+                .def("some def")
+                .countryUse(Set.of("country1","country2")).build();
+        ResponseEntity<String> responseEntity = entryController.addNewEntry(newEntryRequest);
 
-        ResponseEntity<String> responseEntity = entryController.addNewEntry(entry);
-
-        verify(entryRepository, times(1)).save(entry);
+        verify(entryRepository, times(1)).save(any(Entry.class));
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals("New entry added successfully", responseEntity.getBody());
 
