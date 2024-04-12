@@ -1,90 +1,45 @@
 package com.mdlsf.springdiccionariodecalle.entities;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.time.Instant;
 import java.util.Set;
 
+@Builder
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "entries")
 public class Entry {
-
-    private Integer id;
-    private String term;
-    private String def;
-    private Instant lastUpdated = Instant.now();
-    private Instant dateAdded = Instant.now();
-    private String userAdded;
-    private Set<String> countryUse;
-
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EmbeddedId
-    public Integer getId() {
-        return id;
-    }
+    @Id
+    private Integer id;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    @Column(name = "term", nullable = false)
+    private String term;
 
-    @MapsId("entryId")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "entry_id", nullable = false)
-    public String getTerm() {
-        return term;
-    }
-
-    public void setTerm(String term) {
-        this.term = term;
-    }
-
-    @MapsId("defId")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    public String getDef() {
-        return def;
-    }
-
-    public void setDef(String def) {
-        this.def = def;
-    }
+    @Column(name = "def", nullable = false)
+    private String def;
 
     @NotNull
     @Column(name = "last_updated", nullable = false)
-    public Instant getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Instant lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
+    @Builder.Default
+    private Instant lastUpdated = Instant.now();
 
     @NotNull
     @Column(name = "date_added", nullable = false)
-    public Instant getDateAdded() {
-        return dateAdded;
-    }
+    @Builder.Default
+    private Instant dateAdded = Instant.now();
 
-    public void setDateAdded(Instant dateAdded) {
-        this.dateAdded = dateAdded;
-    }
+    @Builder.Default
+    private String userAdded = "admin";
+    private Set<String> countryUse;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_added")
-    public String getUserAdded() {
-        return userAdded;
-    }
-
-    public void setUserAdded(String userAdded) {
-        this.userAdded = userAdded;
-    }
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    public Set<String> getCountryUse() {
-        return countryUse;
-    }
-
-    public void setCountryUse(Set<String> countryUse) {
-        this.countryUse = countryUse;
-    }
 
 }

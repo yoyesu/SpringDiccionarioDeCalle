@@ -27,202 +27,18 @@ securityDefinitions:
     name: api_key
     in: header
 paths:
-  /countries:
-    get:
-      tags:
-        - country
-      summary: get all the countries
-      description: Get all the countries.
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: Accepted
-        '500':
-          description: Internal Server Error
-      security:
-        - api_auth:
-            - 'read:calle'
-  /countries/names:
-    get:
-      tags:
-        - country
-      summary: Get a list with the names of all countries
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '500':
-          description: Internal Server Error
-  /countries/entries/count:
-    get:
-      tags:
-        - country
-      summary: Get count of entries per country
-      description: ""
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '500':
-          description: Internal Server Error
   /:
     get:
       tags:
         - entry
-      summary: Get last ten entries
-      description: Returns a list of entries
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /entries:
-    get:
-      tags:
-        - entry
-      summary: Get all entries
-      description: Returns a list of entries
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /search/{initial}:
-    get:
-      tags:
-        - entry
-      summary: Get entries matching the initial
+      summary: Get entries
       description: Returns a list of entries
       parameters:
-        - name: initial
-          in: path
-          description: Initial of the entry name
-          required: true
-          type: string
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '404':
-          description: No entries found for given initial
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /browse/{character}:
-    get:
-      tags:
-        - entry
-      summary: Get entry names starting with character
-      description: Returns a list of entry names
-      parameters:
-        - name: character
-          in: path
-          description: Initial of the entry name
-          required: true
-          type: string
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '404':
-          description: No entries found for given character
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /search-name/{word}:
-    get:
-      tags:
-        - entry
-      summary: Get entries containing the word in their name
-      description: Returns a list of entries
-      parameters:
-        - name: word
-          in: path
-          description: Word to be found in entry name
-          required: true
-          type: string
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '404':
-          description: No entries found
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /search-definition/{word}:
-    get:
-      tags:
-        - entry
-      summary: Get entries containing the word in their definition
-      description: Returns a list of entries
-      parameters:
-        - name: word
-          in: path
-          description: Word to be found in entry definition
-          required: true
-          type: string
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '404':
-          description: No entries found
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /search-example/{word}:
-    get:
-      tags:
-        - entry
-      summary: Get entries containing the word in their examples
-      description: Returns a list of entries
-      parameters:
-        - name: word
-          in: path
-          description: Word to be found in entry example
-          required: true
-          type: string
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '404':
-          description: No entries found
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /contributors:
-    get:
-      tags:
-        - entry
-      summary: Get all contributors
-      description: Returns a set of users
+        - name: entryLimit
+          in: query
+          description: Number of entries to be returned
+          required: false
+          type: number
       produces:
         - application/json
       responses:
@@ -232,53 +48,6 @@ paths:
           description: Internal Server Error
       security:
         - api_key: [ ]
-  /contributor/{contributor}:
-    get:
-      tags:
-        - entry
-      summary: Get all entries added by contributor
-      description: Returns a list of entries
-      parameters:
-        - name: contributor
-          in: path
-          description: Name of contributor
-          required: true
-          type: string
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '404':
-          description: No contributors found
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /country/{country}:
-    get:
-      tags:
-        - entry
-      summary: Get all entries for one country
-      description: Returns a list of entries
-      parameters:
-        - name: country
-          in: path
-          description: Country name
-          required: true
-          type: string
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-        '404':
-          description: No entries found
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /new:
     post:
       tags:
         - entry
@@ -302,35 +71,7 @@ paths:
           description: Internal Server Error
       security:
         - api_key: [ ]
-  /update/{defId}:
-    patch:
-      tags:
-        - entry
-      summary: Update an entry
-      description: Update one entry by Id
-      parameters:
-        - name: body
-          in: body
-          description: Entry information
-          required: true
-          schema:
-            $ref: "#/definitions/Entry"
-        - name: defId
-          in: path
-          required: true
-          type: number
-      produces:
-        - application/json
-      responses:
-        '201':
-          description: successful operation
-        '404':
-          description: Entry not found
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /remove/{id}:
+  /{id}:
     delete:
       tags:
         - entry
@@ -339,7 +80,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: Id of entry
+          description: Id of the entry
           required: true
           type: number
       produces:
@@ -347,54 +88,6 @@ paths:
       responses:
         '201':
           description: successful operation
-        '404':
-          description: Entry not found
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /remove/def/{id}:
-    delete:
-      tags:
-        - entry
-      summary: Remove a definition
-      description: Remove one definition by Id
-      parameters:
-        - name: id
-          in: path
-          description: Id of definition
-          required: true
-          type: number
-      produces:
-        - application/json
-      responses:
-        '201':
-          description: successful operation
-        '404':
-          description: Entry not found
-        '500':
-          description: Internal Server Error
-      security:
-        - api_key: [ ]
-  /remove/term/{id}:
-    delete:
-      tags:
-        - entry
-      summary: Remove a term
-      description: Remove one term by Id
-      parameters:
-        - name: id
-          in: path
-          description: Id of term
-          required: true
-          type: number
-      produces:
-        - application/json
-      responses:
-        '201':
-          description: successful operation
-        '404':
-          description: Entry not found
         '500':
           description: Internal Server Error
       security:
@@ -408,26 +101,8 @@ definitions:
         type: string
         example: "Dog"
       definition:
-        $ref: "#/definitions/Definition"
-      userAdded:
-        $ref: "#/definitions/User"
+        type: string
       countryUse:
         type: array
         items:
           type: string
-  Definition:
-    type: object
-    properties:
-      definition:
-        description: "explanation of the term"
-        type: string
-        example: "A four-legged animal that barks"
-      example:
-        description: "A sentence that reflects how the term is used"
-        type: string
-        example: "I walk my dog every day."
-  User:
-    type: object
-    properties:
-      userName:
-        type: string
